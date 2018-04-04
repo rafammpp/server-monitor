@@ -30,8 +30,12 @@ def remove_record(servername, reason):
 
 def is_recently_recorded(servername, reason):
     record = f'{servername}|{reason}|'
-    with open('recently-warning-servers.dat', 'r') as f:
-        lines = f.read()
+    try:
+        with open('recently-warning-servers.dat', 'r') as f:
+            lines = f.read()
+    except FileNotFoundError:
+        return False
+
     if lines.find(record) == -1:
         record_warning(servername, reason)
         return False
