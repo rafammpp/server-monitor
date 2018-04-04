@@ -54,7 +54,7 @@ def is_recently_recorded(servername, reason):
 def send_message(message):
     #send(messages=None, conf=None, parse_mode=None, files=None, images=None, captions=None, timeout=30)
     print(message)
-    # send(conf='telegram-send.conf', messages=(message,))
+    send(conf='telegram-send.conf', messages=(message,))
 
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
