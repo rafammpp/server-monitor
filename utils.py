@@ -52,8 +52,8 @@ def is_recently_recorded(servername, reason):
 
 def send_message(message):
     #send(messages=None, conf=None, parse_mode=None, files=None, images=None, captions=None, timeout=30)
-    send(conf='telegram-send.conf', messages=(message,))
     print(message)
+    send(conf='telegram-send.conf', messages=(message,))
 
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
@@ -149,12 +149,18 @@ def check_server(servername, ports=None):
         result = check_http(servername)
 
 def recheck_servers():
-    with open('recently-warning-servers.dat', 'r') as file:
-        for l in file:
-            recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
-            if type(recorded_data[1]) == str:
-                result = error_handler(recorded_data[0], recorded_data[1])
-            else:
-                result = check_port(recorded_data[0], recorded_data[1])
-            if result == 'OK': 
-                compliment(servername=recorded_data[0], port=recorded_data[1])
+    try:
+        with open('recently-warning-servers.dat', 'r') as file:
+            for l in file:
+                recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
+                try:
+                    port = int(recorded_data[1])
+                    result = check_port(recorded_data[0], port)
+                except ValueError:
+                    result = error_handler(recorded_data[0], recorded_data[1])
+                if result == 'OK': 
+                    compliment(servername=recorded_data[0], reason=recorded_data[1])
+
+    except FileNotFoundError:
+        return
+    
