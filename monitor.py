@@ -16,9 +16,6 @@ def get_remote_server(line):
         return line.split(':')[0]
     else:
         return line
-        
-# Clear the screen
-subprocess.call('clear', shell=True)
 
 recheck_servers()
 

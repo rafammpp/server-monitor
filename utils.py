@@ -23,7 +23,7 @@ def remove_record(servername, reason):
     with open('recently-warning-servers.dat', 'r') as f:
         lines = f.read()
     
-    if lines.find(record) == -1:
+    if lines.find(record) != -1:
         lines = re.sub(re.escape(record)+ r'.+\n', '', lines )
         with open('recently-warning-servers.dat', 'w') as f: 
             f.write(lines)
@@ -34,6 +34,7 @@ def is_recently_recorded(servername, reason):
         with open('recently-warning-servers.dat', 'r') as f:
             lines = f.read()
     except FileNotFoundError:
+        record_warning(servername, reason)
         return False
 
     if lines.find(record) == -1:
@@ -42,7 +43,7 @@ def is_recently_recorded(servername, reason):
     else:
         strdate = re.search(re.escape(record) + r'(.+)\n', lines).groups()[0] 
         d = datetime.strptime(strdate, '%Y-%m-%d %H-%M-%S')
-        if abs(d - datetime.now()).seconds/3600 > 1:
+        if abs(d - datetime.now()).seconds/3600 > 3:
             now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
             lines = re.sub(re.escape(record)+ r'.+\n', record + f'{now}' + '\n', lines )
             with open('recently-warning-servers.dat', 'w') as f: 
@@ -53,7 +54,7 @@ def is_recently_recorded(servername, reason):
 def send_message(message):
     #send(messages=None, conf=None, parse_mode=None, files=None, images=None, captions=None, timeout=30)
     print(message)
-    send(conf='telegram-send.conf', messages=(message,))
+    # send(conf='telegram-send.conf', messages=(message,))
 
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
@@ -147,6 +148,8 @@ def check_server(servername, ports=None):
 
     if 80 in ports or 443 in ports:
         result = check_http(servername)
+        if result != 'OK':
+            warning(servername=servername, reason=result)
 
 def recheck_servers():
     try:
