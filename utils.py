@@ -14,23 +14,23 @@ horns = '🤘'
 spock = '🖖'
 
 def record_warning(servername, reason):
-    with open('recently_warning_servers.dat', 'a') as f:
+    with open('recently-warning-servers.dat', 'a') as f:
         now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
         f.write(f'{servername}|{reason}|{now}\n')
 
 def remove_record(servername, reason):
     record = f'{servername}|{reason}|'
-    with open('recently_warning_servers.dat', 'r') as f:
+    with open('recently-warning-servers.dat', 'r') as f:
         lines = f.read()
     
     if lines.find(record) == -1:
         lines = re.sub(re.escape(record)+ r'.+\n', '', lines )
-        with open('recently_warning_servers.dat', 'w') as f: 
+        with open('recently-warning-servers.dat', 'w') as f: 
             f.write(lines)
 
 def is_recently_recorded(servername, reason):
     record = f'{servername}|{reason}|'
-    with open('recently_warning_servers.dat', 'r') as f:
+    with open('recently-warning-servers.dat', 'r') as f:
         lines = f.read()
     if lines.find(record) == -1:
         record_warning(servername, reason)
@@ -41,7 +41,7 @@ def is_recently_recorded(servername, reason):
         if abs(d - datetime.now()).seconds/3600 > 1:
             now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
             lines = re.sub(re.escape(record)+ r'.+\n', record + f'{now}' + '\n', lines )
-            with open('recently_warning_servers.dat', 'w') as f: 
+            with open('recently-warning-servers.dat', 'w') as f: 
                 f.write(lines)
             return False
         return True
@@ -145,7 +145,7 @@ def check_server(servername, ports=None):
         result = check_http(servername)
 
 def recheck_servers():
-    with open('recently_warning_servers.dat', 'r') as file:
+    with open('recently-warning-servers.dat', 'r') as file:
         for l in file:
             recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
             if type(recorded_data[1]) == str:
