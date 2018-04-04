@@ -1,8 +1,9 @@
-#!/usr/bin/env python
-import subprocess
+#!/usr/bin/env python3
 import requests
-from utils import check_server, recheck_servers, default_ports
-file = open('server-list.dat', 'r')
+from utils import check_server, recheck_servers, default_ports, abs_path
+import os
+
+file = open(os.path.join(abs_path, 'server-list.dat'))
 
 def get_port_list(line):
     if ':' in line and line.split(':')[1]:

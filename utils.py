@@ -3,6 +3,7 @@ import requests
 from datetime import datetime
 from telegram_send import send
 import re
+import os
 
 default_ports = (22, 25, 80, 110, 143, 993, 995, 443,)
 shit = '💩'
@@ -13,25 +14,28 @@ thumbs_down = '👎'
 horns = '🤘'
 spock = '🖖'
 
+abs_path = os.path.dirname(os.path.abspath(__file__))
+
+
 def record_warning(servername, reason):
-    with open('recently-warning-servers.dat', 'a') as f:
+    with open(os.path.join(abs_path, 'recently-warning-servers.dat'), 'a') as f:
         now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
         f.write(f'{servername}|{reason}|{now}\n')
 
 def remove_record(servername, reason):
     record = f'{servername}|{reason}|'
-    with open('recently-warning-servers.dat', 'r') as f:
+    with open(os.path.join(abs_path, 'recently-warning-servers.dat'), 'r') as f:
         lines = f.read()
     
     if lines.find(record) != -1:
         lines = re.sub(re.escape(record)+ r'.+\n', '', lines )
-        with open('recently-warning-servers.dat', 'w') as f: 
+        with open(os.path.join(abs_path, 'recently-warning-servers.dat'), 'w') as f: 
             f.write(lines)
 
 def is_recently_recorded(servername, reason):
     record = f'{servername}|{reason}|'
     try:
-        with open('recently-warning-servers.dat', 'r') as f:
+        with open(os.path.join(abs_path, 'recently-warning-servers.dat'), 'r') as f:
             lines = f.read()
     except FileNotFoundError:
         record_warning(servername, reason)
@@ -46,7 +50,7 @@ def is_recently_recorded(servername, reason):
         if abs(d - datetime.now()).seconds/3600 > 3:
             now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
             lines = re.sub(re.escape(record)+ r'.+\n', record + f'{now}' + '\n', lines )
-            with open('recently-warning-servers.dat', 'w') as f: 
+            with open(os.path.join(abs_path, 'recently-warning-servers.dat'), 'w') as f: 
                 f.write(lines)
             return False
         return True
@@ -153,7 +157,7 @@ def check_server(servername, ports=None):
 
 def recheck_servers():
     try:
-        with open('recently-warning-servers.dat', 'r') as file:
+        with open(os.path.join(abs_path, 'recently-warning-servers.dat'), 'r') as file:
             for l in file:
                 recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
                 try:
