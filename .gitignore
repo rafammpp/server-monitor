@@ -1,0 +1,5 @@
+__pycache__/
+*.dat
+*.sublime-project
+*.conf
+*.sublime-workspace

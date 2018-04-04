@@ -1,0 +1,9 @@
+# format: domainname.com:port list separated by commas
+# Example: domain.com:22,80
+# you can omit the port list, by default it use this ports
+# default ports : 22, 25, 80, 110, 143, 993, 995, 443
+# The lines below are a working example
+
+google.com
+apple.es:22,80,443
+ubuntu.com:80
