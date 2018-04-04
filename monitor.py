@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import subprocess
 import requests
-from utils import check_server, recheck_servers
+from utils import check_server, recheck_servers, default_ports
 file = open('server_list.dat', 'r')
 
 def get_port_list(line):

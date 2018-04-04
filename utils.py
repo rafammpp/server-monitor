@@ -148,7 +148,6 @@ def recheck_servers():
     with open('recently_warning_servers.dat', 'r') as file:
         for l in file:
             recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
-            print (recorded_data)
             if type(recorded_data[1]) == str:
                 result = error_handler(recorded_data[0], recorded_data[1])
             else:
