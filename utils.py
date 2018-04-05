@@ -5,7 +5,8 @@ from telegram_send import send
 import re
 import os
 
-default_ports = (22, 25, 80, 110, 143, 993, 995, 443,)
+default_ports = (22, 25, 80, 110, 143, 443, 993, 995,)
+port_service = {22: 'SSH', 25:'SMTP', 80:'HTTP', 443: 'HTTPS', 110: 'POP3', 143:'IMAP', 993: 'IMAPS', 995: 'POP3S', 9999: 'Test port' }
 shit = '💩'
 fuck_u = '🖕'
 good = '👌'
@@ -58,8 +59,8 @@ def is_recently_recorded(servername, reason):
 def send_message(message):
     #send(messages=None, conf=None, parse_mode=None, files=None, images=None, captions=None, timeout=30)
     print(message)
-    send(conf='telegram-send.conf', messages=(message,))
-
+    send(conf=os.path.join(abs_path,'telegram-send.conf'), messages=(message,))
+    
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
         if message:
@@ -73,7 +74,7 @@ def warning(servername, reason, message=None):
         elif reason == 'DNS_ERROR':
             send_message(f'{servername} could not be resolved. Maybe is died or has a bad configured dns. So, there is a {shit} somewhere')
         else:
-            send_message(f'{servername} not responding at port {reason} {thumbs_down}')
+            send_message(f'{servername} not responding at port {reason} {"("+port_service[reason]+")" if reason in port_service else ""} {thumbs_down}')
 
 def compliment(servername, reason=None, message=None):
     remove_record(servername, reason)
@@ -88,7 +89,7 @@ def compliment(servername, reason=None, message=None):
     elif reason == 'DNS_ERROR':
         send_message(f'{servername} is now resolving his dns {thumbs_up}')
     else:
-        send_message(f'{servername} is now responding at port {reason} {horns}{horns} {thumbs_up}')
+        send_message(f'{servername} is now responding at port {reason} ({port_service[reason]}) {horns}{horns} {thumbs_up}')
 
 def check_port(remote_server, port):
     try:
