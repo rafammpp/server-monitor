@@ -12,8 +12,8 @@ file = open(server_list_path)
 
 def get_port_list(line):
     if ':' in line and line.split(':')[1]:
-        list_ports = line.split(':')[1].split(',')
-        return [ int(p) for p in list_ports ]
+        port_list = line.split(':')[1].split(',')
+        return [ int(p) for p in port_list ]
     else:
         return default_ports
 

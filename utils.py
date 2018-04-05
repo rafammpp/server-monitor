@@ -61,7 +61,7 @@ def send_message(message):
     print(message)
     if not DEBUG:
         send(conf=telegram_conf_path, messages=(message,))
-    
+
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
         if message:
