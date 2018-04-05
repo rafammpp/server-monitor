@@ -4,3 +4,4 @@ __pycache__/
 *.conf
 *.sublime-workspace
 *.log
+user_settings.py

@@ -10,7 +10,7 @@ def get_port_list(line):
         list_ports = line.split(':')[1].split(',')
         return [ int(p) for p in list_ports ]
     else:
-        return default_ports 
+        return default_ports
 
 def get_remote_server(line):
     if ':' in line and line.split(':')[1]:
