@@ -87,7 +87,7 @@ def compliment(servername, reason=None, message=None):
         send_message(f'{servername} is now alive!! {spock} {good}')
     elif reason == 'SSL_ERROR':
         send_message(f'{servername} is now working over https {good} {thumbs_up}')
-    elif reason.startswith('HTTP_') :
+    elif type(reason) == str and reason.startswith('HTTP_') :
         send_message(f'{servername} server has send a good http response. Great! {spock} {thumbs_up}')
     elif reason == 'DNS_ERROR':
         send_message(f'{servername} is now resolving his dns {thumbs_up}')
