@@ -8,6 +8,8 @@ try:
 except ImportError:
     from default_settings import default_ports, server_list_path
 
+print('#'*60)
+print('#'*60)
 file = open(server_list_path)
 
 def get_port_list(line):
