@@ -1,11 +1,11 @@
 import socket
 import requests
 from datetime import datetime
-from telegram_send import send
+import telegram
 import re
 import os
 try:
-    from user_settings import default_ports, DEBUG, recently_warning_servers_path, server_list_path, telegram_conf_path
+    from user_settings import *
 except ImportError:
     from default_settings import default_ports, DEBUG, recently_warning_servers_path, server_list_path, telegram_conf_path
 
@@ -17,6 +17,11 @@ thumbs_up = '👍'
 thumbs_down = '👎'
 horns = '🤘'
 spock = '🖖'
+
+if TELEGRAM_TOKEN:
+    bot = telegram.Bot(token=TELEGRAM_TOKEN)
+
+
 
 def record_warning(servername, reason):
     with open(recently_warning_servers_path, 'a') as f:
@@ -56,11 +61,10 @@ def is_recently_recorded(servername, reason):
             return False
         return True
 
-def send_message(message):
-    #send(messages=None, conf=None, parse_mode=None, files=None, images=None, captions=None, timeout=30)
+def send_message(message, silently=False):
     print(message)
-    if not DEBUG:
-        send(conf=telegram_conf_path, messages=(message,))
+    if not DEBUG and bot:
+        bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently)
 
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
@@ -69,7 +73,7 @@ def warning(servername, reason, message=None):
         elif reason == 'DIED':
             send_message(f'{servername} is died. RIP. That is a {shit}')
         elif reason == 'SSL_ERROR':
-            send_message(f'{servername} has a SLL error. https is not working. Too bad {thumbs_down}')
+            send_message(f'{servername} has a SLL error. https is not working. Too bad {thumbs_down}', True)
         elif type(reason) == str and reason.startswith('HTTP_') :
             send_message(f'{servername} return a {reason} error code. Time to work {thumbs_down}')
         elif reason == 'DNS_ERROR':
