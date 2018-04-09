@@ -1,6 +1,7 @@
 import socket
 import requests
 from datetime import datetime
+from random import randrange
 import telegram
 import re
 import os
@@ -17,12 +18,25 @@ thumbs_up = '👍'
 thumbs_down = '👎'
 horns = '🤘'
 spock = '🖖'
+wink = '😉'
+smile = '😊'
+thinking = '🤔'
+disapointed = '😞'
+crying = '😢'
+screaming = '😱'
+
+emojis_good = (good, thumbs_up, horns, spock, wink, smile,)
+emojis_bad = (shit, fuck_u, thumbs_down, disapointed, crying, screaming)
 
 if TELEGRAM_TOKEN:
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
 
+def good():
+    return emojis_good[randrange(len(emojis_good))]
 
-
+def bad():
+    return emojis_bad[randrange(len(emojis_bad))]
+ 
 def record_warning(servername, reason):
     with open(recently_warning_servers_path, 'a') as f:
         now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
@@ -61,9 +75,9 @@ def is_recently_recorded(servername, reason):
             return False
         return True
 
-def send_message(message, silently=False):
+def send_message(message, silently=False, force=False):
     print(message)
-    if not DEBUG and bot:
+    if (not DEBUG and bot) or force:
         bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently)
 
 def warning(servername, reason, message=None):
@@ -71,32 +85,32 @@ def warning(servername, reason, message=None):
         if message:
             send_message(f'{servername} {message}')
         elif reason == 'DIED':
-            send_message(f'{servername} is died. RIP. That is a {shit}')
+            send_message(f'{servername} is died. RIP. That is a {bad()}')
         elif reason == 'SSL_ERROR':
-            send_message(f'{servername} has a SLL error. https is not working. Too bad {thumbs_down}', True)
+            send_message(f'{servername} has a SLL error. https is not working. Too bad {bad()}', True)
         elif type(reason) == str and reason.startswith('HTTP_') :
-            send_message(f'{servername} return a {reason} error code. Time to work {thumbs_down}')
+            send_message(f'{servername} return a {reason} error code. Time to work {bad()}')
         elif reason == 'DNS_ERROR':
-            send_message(f'{servername} could not be resolved. Maybe is died or has a bad configured dns. So, there is a {shit} somewhere')
+            send_message(f'{servername} could not be resolved. Maybe is died or has a bad configured dns {thinking}')
         else:
-            send_message(f'{servername} not responding at port {reason} {"("+port_service[reason]+")" if reason in port_service else ""} {thumbs_down}')
+            send_message(f'{servername} not responding at port {reason} {"("+port_service[reason]+")" if reason in port_service else ""} {bad()}')
     else:
-        print(f'LOG: {servername} {reason}{message}')
+        print(f'LOG: {servername} {reason} {message}')
 
 def compliment(servername, reason=None, message=None):
     remove_record(servername, reason)
     if message:
         send_message(f'{servername} {message}')
     elif reason == 'DIED':
-        send_message(f'{servername} is now alive!! {spock} {good}')
+        send_message(f'{servername} is now alive!! {good()} {good()}')
     elif reason == 'SSL_ERROR':
-        send_message(f'{servername} is now working over https {good} {thumbs_up}')
+        send_message(f'{servername} is now working over https {good()} {good()}')
     elif type(reason) == str and reason.startswith('HTTP_') :
-        send_message(f'{servername} server has send a good http response. Great! {spock} {thumbs_up}')
+        send_message(f'{servername} server has send a good http response. Great! {good()} {good()}')
     elif reason == 'DNS_ERROR':
-        send_message(f'{servername} is now resolving his dns {thumbs_up}')
+        send_message(f'{servername} is now resolving his dns {good()}')
     else:
-        send_message(f'{servername} is now responding at port {reason} ({port_service[reason]}) {horns}{horns} {thumbs_up}')
+        send_message(f'{servername} is now responding at port {reason} ({port_service[reason]}) {good()}{good()}')
 
 def check_port(remote_server, port):
     try:
