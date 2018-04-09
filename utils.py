@@ -91,7 +91,7 @@ def compliment(servername, reason=None, message=None):
         send_message(f'{servername} is now alive!! {spock} {good}')
     elif reason == 'SSL_ERROR':
         send_message(f'{servername} is now working over https {good} {thumbs_up}')
-    elif reason.startswith('HTTP_') :
+    elif type(reason) == str and reason.startswith('HTTP_') :
         send_message(f'{servername} server has send a good http response. Great! {spock} {thumbs_up}')
     elif reason == 'DNS_ERROR':
         send_message(f'{servername} is now resolving his dns {thumbs_up}')
@@ -111,7 +111,6 @@ def check_port(remote_server, port):
             return 'OK'
 
     except socket.error:
-        print ("Couldn't connect to server")
         return 'DIED'
 
     except socket.gaierror:
@@ -149,7 +148,7 @@ def check_server(servername, ports=None):
     print("-" * 60) 
     print ("Please wait, scanning remote host", servername)
     print ("-" * 60)
-    print(servername)
+
     if not ports:
         ports = default_ports
 
@@ -163,11 +162,16 @@ def check_server(servername, ports=None):
         if result != 'OK':
             warning(servername=servername, reason=result)
 
+    print ("-" * 60)
+
 def recheck_servers():
     try:
         with open(recently_warning_servers_path, 'r') as file:
+            print('Rechecking recorded warnings...')
+            print ("-" * 60)
             for l in file:
                 recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
+                
                 try:
                     port = int(recorded_data[1])
                     result = check_port(recorded_data[0], port)
@@ -175,6 +179,9 @@ def recheck_servers():
                     result = error_handler(recorded_data[0], recorded_data[1])
                 if result == 'OK':
                     compliment(servername=recorded_data[0], reason=recorded_data[1])
+                else:
+                    print(l,' --> ', result)
+            print ("-" * 60)
 
     except FileNotFoundError:
         return
