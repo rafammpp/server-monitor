@@ -1,6 +1,6 @@
 import socket
 import requests
-from datetime import datetime
+from datetime import datetime, time
 from random import randrange
 import telegram
 import re
@@ -39,6 +39,14 @@ def good():
 def bad():
     return emojis_bad[randrange(len(emojis_bad))]
  
+def is_night():
+    now = datetime.now()
+    now_time = now.time()
+    if now_time >= time(23,00) or now_time <= time(9,00): 
+        return True
+    else:
+        return False
+
 def record_warning(servername, reason):
     with open(recently_warning_servers_path, 'a') as f:
         now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
@@ -79,6 +87,9 @@ def is_recently_recorded(servername, reason):
 
 def send_message(message, silently=False, force=False):
     print(message)
+    if is_night():
+        silently = True
+
     if (not DEBUG and bot) or force:
         bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently)
 
