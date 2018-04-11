@@ -24,8 +24,10 @@ thinking = '🤔'
 disapointed = '😞'
 crying = '😢'
 screaming = '😱'
+love = '😍'
+victory = '✌'
 
-emojis_good = (good, thumbs_up, horns, spock, wink, smile,)
+emojis_good = (good, thumbs_up, horns, spock, wink, smile, love, victory)
 emojis_bad = (shit, fuck_u, thumbs_down, disapointed, crying, screaming)
 
 if TELEGRAM_TOKEN:
@@ -40,10 +42,10 @@ def bad():
 def record_warning(servername, reason):
     with open(recently_warning_servers_path, 'a') as f:
         now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
-        f.write(f'{servername}|{reason}|{now}\n')
+        f.write(f'|{servername}|{reason}|{now}|\n')
 
 def remove_record(servername, reason):
-    record = f'{servername}|{reason}|'
+    record = f'|{servername}|{reason}|'
     with open(recently_warning_servers_path, 'r') as f:
         lines = f.read()
 
@@ -53,7 +55,7 @@ def remove_record(servername, reason):
             f.write(lines)
 
 def is_recently_recorded(servername, reason):
-    record = f'{servername}|{reason}|'
+    record = f'|{servername}|{reason}|'
     try:
         with open(recently_warning_servers_path, 'r') as f:
             lines = f.read()
@@ -65,11 +67,11 @@ def is_recently_recorded(servername, reason):
         record_warning(servername, reason)
         return False
     else:
-        strdate = re.search(re.escape(record) + r'(.+)\n', lines).groups()[0] 
+        strdate = re.search(re.escape(record) + r'(.+)\|\n', lines).groups()[0] 
         d = datetime.strptime(strdate, '%Y-%m-%d %H-%M-%S')
         if abs(d - datetime.now()).seconds/3600 > 3:
             now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
-            lines = re.sub(re.escape(record)+ r'.+\n', record + f'{now}' + '\n', lines )
+            lines = re.sub(re.escape(record)+ r'.+\n', record + f'{now}' + '|\n', lines )
             with open(recently_warning_servers_path, 'w') as f: 
                 f.write(lines)
             return False
