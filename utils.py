@@ -85,13 +85,13 @@ def is_recently_recorded(servername, reason):
             return False
         return True
 
-def send_message(message, silently=False, force=False):
+def send_message(message, silently=False, force=False, parse_mode=''):
     print(message)
     if is_night():
         silently = True
 
     if (not DEBUG and bot) or force:
-        bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently)
+        bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently, parse_mode=parse_mode    )
 
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
@@ -124,6 +124,15 @@ def compliment(servername, reason=None, message=None):
         send_message(f'{servername} is now resolving his dns {good()}')
     else:
         send_message(f'{servername} is now responding at port {reason} ({port_service[reason]}) {good()}{good()}')
+
+def quote():
+    now = datetime.now()
+    now_time = now.time()
+    if now_time >= time(23,00) and now_time < time(23,5): 
+        r = requests.get(url='http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1')
+        data = r.json()[0]
+        quote = 'Quote of the day:\n'+re.sub(r'(<p>)|(</p>)', '', data['content'])+data['title']
+        send_message(message=quote, parse_mode='HTML')
 
 def check_port(remote_server, port):
     try:

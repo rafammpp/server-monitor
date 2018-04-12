@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import requests
-from utils import check_server, recheck_servers
+from utils import check_server, recheck_servers, quote
 import os
 import sys
 try:
@@ -39,5 +39,7 @@ else:
             port_list = get_port_list(line)
             check_server(remote_server, port_list)
     file.close()
+
+quote()
 
 print('bye!')
