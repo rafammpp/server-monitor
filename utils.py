@@ -206,17 +206,18 @@ def recheck_servers():
             print('Rechecking recorded warnings...')
             print ("-" * 60)
             for l in file:
-                recorded_data = l.split('|') # {servername}|{reason}|{datetime.now()}\n
-                
+                recorded_data = l.split('|') # |{servername}|{reason}|{datetime.now()}|\n
+                recorded_data = list(filter(None, recorded_data)) # remove empty strings
                 try:
                     port = int(recorded_data[1])
                     result = check_port(recorded_data[0], port)
                 except ValueError:
                     result = error_handler(recorded_data[0], recorded_data[1])
                 if result == 'OK':
-                    compliment(servername=recorded_data[0], reason=recorded_data[1])
-                else:
-                    print(l,' --> ', result)
+                    reason = port if port else recorded_data
+                    compliment(servername=recorded_data[0], reason=reason)
+                
+                print(l,' --> ', result)
             print ("-" * 60)
 
     except FileNotFoundError:
