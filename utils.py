@@ -77,7 +77,7 @@ def is_recently_recorded(servername, reason):
     else:
         strdate = re.search(re.escape(record) + r'(.+)\|\n', lines).groups()[0] 
         d = datetime.strptime(strdate, '%Y-%m-%d %H-%M-%S')
-        if abs(d - datetime.now()).seconds/3600 > 3:
+        if abs(d - datetime.now()).seconds/3600 > 12:
             now = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
             lines = re.sub(re.escape(record)+ r'.+\n', record + f'{now}' + '|\n', lines )
             with open(recently_warning_servers_path, 'w') as f: 
