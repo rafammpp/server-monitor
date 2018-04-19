@@ -62,6 +62,20 @@ def remove_record(servername, reason):
         with open(recently_warning_servers_path, 'w') as f: 
             f.write(lines)
 
+def is_recorded(servername, reason):
+    record = f'|{servername}|{reason}|'
+    try:
+        with open(recently_warning_servers_path, 'r') as f:
+            lines = f.read()
+    except FileNotFoundError:
+        record_warning(servername, reason)
+        return False
+
+    if lines.find(record) == -1:
+        return False
+    else:
+        return True
+
 def is_recently_recorded(servername, reason):
     record = f'|{servername}|{reason}|'
     try:
@@ -128,11 +142,13 @@ def compliment(servername, reason=None, message=None):
 def quote():
     now = datetime.now()
     now_time = now.time()
-    if now_time >= time(23,00) and now_time < time(23,5): 
-        r = requests.get(url='http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1')
-        data = r.json()[0]
-        quote = 'Quote of the day:\n'+re.sub(r'(<p>)|(</p>)', '', data['content'])+data['title']
-        send_message(message=quote, parse_mode='HTML')
+    if now_time >= time(23,00) and now_time < time(23,5):
+        r = requests.get(url="https://andruxnet-random-famous-quotes.p.mashape.com/",
+                                headers={"X-Mashape-Key": "4WVC9IL5lpmshhPQDUeefIfhbbLqp1u6Djijsnq7Ta41f631tF",
+                                         "Accept": "application/json"}
+                                )
+        j = r.json()
+        send_message(message=f'{j["quote"]} \n{j["author"]}')
 
 def check_port(remote_server, port):
     try:
