@@ -147,7 +147,7 @@ def quote():
                                 headers={"X-Mashape-Key": "4WVC9IL5lpmshhPQDUeefIfhbbLqp1u6Djijsnq7Ta41f631tF",
                                          "Accept": "application/json"}
                                 )
-        j = r.json()
+        j = r.json()[0]
         send_message(message=f'{j["quote"]} \n{j["author"]}')
 
 def check_port(remote_server, port):
