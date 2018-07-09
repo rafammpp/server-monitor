@@ -10,6 +10,7 @@ try:
 except ImportError:
     from default_settings import default_ports, DEBUG, recently_warning_servers_path, server_list_path, telegram_conf_path
 
+messages = {}
 port_service = {22: 'SSH', 25:'SMTP', 80:'HTTP', 443: 'HTTPS', 110: 'POP3', 143:'IMAP', 993: 'IMAPS', 995: 'POP3S', 9999: 'Test port' }
 shit = '💩'
 fuck_u = '🖕'
@@ -105,39 +106,44 @@ def send_message(message, silently=False, force=False, parse_mode=''):
         silently = True
 
     if (not DEBUG and bot) or force:
-        bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently, parse_mode=parse_mode    )
+        bot.send_message(chat_id=CHAT_ID, text=message, disable_notification=silently, parse_mode=parse_mode)
+
+def store_message(servername, message):
+    if not servername in messages:
+        messages[servername] = []
+    messages[servername].append(message)
 
 def warning(servername, reason, message=None):
     if not is_recently_recorded(servername, reason):
         if message:
-            send_message(f'{servername} {message}')
+            store_message(servername, f'{message}')
         elif reason == 'DIED':
-            send_message(f'{servername} is died. RIP. That is a {bad()}')
+            store_message(servername, f'is died. RIP. That is a {bad()}')
         elif reason == 'SSL_ERROR':
-            send_message(f'{servername} has a SLL error. https is not working. Too bad {bad()}', True)
+            store_message(servername, f'has a SLL error. https is not working. Too bad {bad()}')
         elif type(reason) == str and reason.startswith('HTTP_') :
-            send_message(f'{servername} return a {reason} error code. Time to work {bad()}')
+            store_message(servername, f'return a {reason} error code. Time to work {bad()}')
         elif reason == 'DNS_ERROR':
-            send_message(f'{servername} could not be resolved. Maybe is died or has a bad configured dns {thinking}')
+            store_message(servername, f'could not be resolved. Maybe is died or has a bad configured dns {thinking}')
         else:
-            send_message(f'{servername} not responding at port {reason} {"("+port_service[reason]+")" if reason in port_service else ""} {bad()}')
+            store_message(servername, f'not responding at port {reason} {"("+port_service[reason]+")" if reason in port_service else ""} {bad()}')
     else:
         print(f'LOG: {servername} {reason} {message}')
 
 def compliment(servername, reason=None, message=None):
     remove_record(servername, reason)
     if message:
-        send_message(f'{servername} {message}')
+        store_message(servername, f'{message}')
     elif reason == 'DIED':
-        send_message(f'{servername} is now alive!! {good()} {good()}')
+        store_message(servername, f'is now alive!! {good()} {good()}')
     elif reason == 'SSL_ERROR':
-        send_message(f'{servername} is now working over https {good()} {good()}')
+        store_message(servername, f'is now working over https {good()} {good()}')
     elif type(reason) == str and reason.startswith('HTTP_') :
-        send_message(f'{servername} server has send a good http response. Great! {good()} {good()}')
+        store_message(servername, f'server has send a good http response. Great! {good()} {good()}')
     elif reason == 'DNS_ERROR':
-        send_message(f'{servername} is now resolving his dns {good()}')
+        store_message(servername, f'is now resolving his dns {good()}')
     else:
-        send_message(f'{servername} is now responding at port {reason} ({port_service[reason]}) {good()}{good()}')
+        store_message(servername, f'is now responding at port {reason} ({port_service[reason]}) {good()}{good()}')
 
 def quote():
     now = datetime.now()
@@ -149,6 +155,14 @@ def quote():
                                 )
         j = r.json()[0]
         send_message(message=f'{j["quote"]} \n{j["author"]}')
+
+def send_messages():
+    print(messages)
+    for servername, message_list in messages.items():
+        text = f'{servername}:\n'
+        for message in message_list:
+            text += message + '\n'
+        send_message(text)
 
 def check_port(remote_server, port):
     try:
