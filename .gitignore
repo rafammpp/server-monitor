@@ -5,3 +5,5 @@ __pycache__/
 *.sublime-workspace
 *.log
 user_settings.py
+Pipfile
+Pipfile.lock

@@ -125,6 +125,8 @@ def warning(servername, reason, message=None):
             store_message(servername, f'return a {reason} error code. Time to work {bad()}')
         elif reason == 'DNS_ERROR':
             store_message(servername, f'could not be resolved. Maybe is died or has a bad configured dns {thinking}')
+        elif reason == 'READ_TIMEOUT':
+            store_message(servername, f'return a {reason} error code. Time to work {bad()}')
         else:
             store_message(servername, f'not responding at port {reason} {"("+port_service[reason]+")" if reason in port_service else ""} {bad()}')
     else:
@@ -142,6 +144,8 @@ def compliment(servername, reason=None, message=None):
         store_message(servername, f'server has send a good http response. Great! {good()} {good()}')
     elif reason == 'DNS_ERROR':
         store_message(servername, f'is now resolving his dns {good()}')
+    elif reason == 'READ_TIMEOUT':
+        store_message(servername, f'is now OK {good()}')
     else:
         store_message(servername, f'is now responding at port {reason} ({port_service[reason]}) {good()}{good()}')
 
@@ -153,8 +157,12 @@ def quote():
                                 headers={"X-Mashape-Key": "4WVC9IL5lpmshhPQDUeefIfhbbLqp1u6Djijsnq7Ta41f631tF",
                                          "Accept": "application/json"}
                                 )
+        
         j = r.json()[0]
-        send_message(message=f'{j["quote"]} \n{j["author"]}')
+        if j:
+            send_message(message=f'{j["quote"]} \n{j["author"]}')
+        else:
+            send_message(message="I do not have any quotes but I'm still alive")
 
 def send_messages():
     print(messages)
@@ -191,6 +199,8 @@ def error_handler(servername, reason):
         return check_http(servername, ssl=False)    
     elif reason == 'DNS_ERROR':
         return check_port(servername, 80)
+    elif reason == 'READ_TIMEOUT':
+        return check_http(servername)
     else:
         return False
 
@@ -207,14 +217,12 @@ def check_http(remote_server, ssl=True):
 
     except requests.exceptions.SSLError:
         return 'SSL_ERROR'
+    except requests.exceptions.ReadTimeout:
+        return 'READ_TIMEOUT'
     except requests.exceptions.ConnectionError:
         return 80
 
 def check_server(servername, ports=None):
-    print("-" * 60) 
-    print ("Please wait, scanning remote host", servername)
-    print ("-" * 60)
-
     if not ports:
         ports = default_ports
 
@@ -227,8 +235,6 @@ def check_server(servername, ports=None):
         result = check_http(servername, ssl=(443 in ports))
         if result != 'OK':
             warning(servername=servername, reason=result)
-
-    print ("-" * 60)
 
 def recheck_servers():
     try:
