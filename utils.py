@@ -218,7 +218,8 @@ def check_http(remote_server, ssl=True):
     except requests.exceptions.SSLError:
         return 'SSL_ERROR'
     except requests.exceptions.ReadTimeout:
-        return 'READ_TIMEOUT'
+	return 'OK'
+#        return 'READ_TIMEOUT'
     except requests.exceptions.ConnectionError:
         return 80
 
