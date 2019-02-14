@@ -176,7 +176,7 @@ def check_port(remote_server, port):
     try:
         remote_server_ip = socket.gethostbyname(remote_server)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(10)
+        sock.settimeout(15)
         result = sock.connect_ex((remote_server_ip, port))
         sock.close()
         if result != 0:
