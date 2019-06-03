@@ -153,14 +153,20 @@ def quote():
     now = datetime.now()
     now_time = now.time()
     if now_time >= time(23,00) and now_time < time(23,5):
-        r = requests.get(url="https://andruxnet-random-famous-quotes.p.mashape.com/",
-                                headers={"X-Mashape-Key": "4WVC9IL5lpmshhPQDUeefIfhbbLqp1u6Djijsnq7Ta41f631tF",
-                                         "Accept": "application/json"}
-                                )
-        
-        j = r.json()[0]
-        if j:
-            send_message(message=f'{j["quote"]} \n{j["author"]}')
+        r = requests.get(url="https://quotes.rest/qod", headers={"Accept": "application/json"})
+        try:
+            j = r.json()
+
+        except Exception as e:
+            send_message(message="The quotes service are not working but I'm still alive")
+
+        if 'success' in j:
+            try:
+                quote_text = j['contents']['quotes'][0]['quote']
+                quote_author = j['contents']['quotes'][0]['author']
+                send_message(message=f'{quote_text} \n{quote_author}')
+            except KeyError:
+                send_message(message="There was an error parsing quote json, but I'm still alive")
         else:
             send_message(message="I do not have any quotes but I'm still alive")
 
