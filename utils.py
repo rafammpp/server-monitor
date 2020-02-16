@@ -152,7 +152,7 @@ def compliment(servername, reason=None, message=None):
 def quote():
     now = datetime.now()
     now_time = now.time()
-    if now_time >= time(23,00) and now_time < time(23,5):
+    if now_time >= time(23,5) and now_time < time(23,10):
         r = requests.get(url="https://quotes.rest/qod", headers={"Accept": "application/json"})
         try:
             j = r.json()
